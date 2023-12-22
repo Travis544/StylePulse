@@ -1,49 +1,55 @@
 // import { launchImageLibrary } from 'react-native-image-picker';
 
 import { View, Pressable, Text } from 'react-native';
-import { globalStyles } from '../globalStyles';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-export default function PhotoButton({ imageSelectedCallback }) {
-    const openImagePicker = () => {
-        const options = {
-            mediaType: 'photo',
-            includeBase64: false,
-            maxHeight: 2000,
-            maxWidth: 2000,
-        };
+import { globalStyles } from '../globalStyles'
 
-        launchImageLibrary(options, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('Image picker error: ', response.error);
-            } else {
-                let imageUri = response.uri || response.assets?.[0]?.uri;
-                console.log(imageUri)
-                imageSelectedCallback(imageUri)
-            }
+import * as ImagePicker from 'expo-image-picker';
+
+export default function PhotoButton({ imageSelectedCallback }) {
+
+    const [cameraPermissionStatus, requestPermission] = ImagePicker.useCameraPermissions();
+
+    const openImagePicker = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            // aspect: [4, 3],
+            quality: 1,
         });
+
+        console.log(result);
+
+        if (!result.canceled) {
+            console.log(result.assets[0].uri)
+            imageSelectedCallback(result.assets[0].uri)
+        }
     };
 
-    const handleCameraLaunch = () => {
-        const options = {
-            mediaType: 'photo',
-            includeBase64: false,
-            maxHeight: 2000,
-            maxWidth: 2000,
-        };
+    const handleCameraLaunch = async () => {
 
-        launchCamera(options, response => {
-            if (response.didCancel) {
-                console.log('User cancelled camera');
-            } else if (response.error) {
-                console.log('Camera Error: ', response.error);
-            } else {
-                let imageUri = response.uri || response.assets?.[0]?.uri;
-                imageSelectedCallback(imageUri)
-                console.log(imageUri);
+        const options = {
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            // aspect: [4, 3],
+            quality: 1,
+        };
+        if (cameraPermissionStatus.status == "denied" || cameraPermissionStatus.status == "undetermined") {
+            const permissionRes = await requestPermission()
+            console.log("PERMISSION RES")
+            console.log(permissionRes)
+            if (permissionRes.granted == false) {
+                return
             }
-        });
+        }
+
+        const result = await ImagePicker.launchCameraAsync(options)
+        if (result.canceled) {
+            return
+        } else {
+            console.log(result.assets[0].uri)
+            imageSelectedCallback(result.assets[0].uri)
+        }
     }
 
     return (
@@ -55,7 +61,7 @@ export default function PhotoButton({ imageSelectedCallback }) {
             </Pressable>
             <Pressable style={globalStyles.button} onPress={handleCameraLaunch}>
                 <Text style={globalStyles.text}>
-                    Open Camera
+                    Choose from Camera
                 </Text>
             </Pressable>
         </View>

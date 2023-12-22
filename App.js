@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
-import TakePictureScreen from './screens/TakePictureScreen';
+import PromptScreen from './screens/PromptScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator()
@@ -13,7 +13,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen
           name="Take Picture"
-          component={TakePictureScreen}
+          component={PromptScreen}
         />
       </Stack.Navigator>
       <StatusBar style="auto" />
