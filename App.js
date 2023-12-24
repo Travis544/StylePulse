@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import PromptScreen from './screens/PromptScreen';
+import RecommendationScreen from './screens/RecommendationScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator()
@@ -12,8 +13,12 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Take Picture"
+          name="Prompt Screen"
           component={PromptScreen}
+        />
+        <Stack.Screen
+          name="Recommendation Screen"
+          component={RecommendationScreen}
         />
       </Stack.Navigator>
       <StatusBar style="auto" />

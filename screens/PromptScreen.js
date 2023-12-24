@@ -1,21 +1,27 @@
-import { View, ScrollView, StyleSheet, Image, Pressable, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Image, Pressable, Text, TextInput } from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
 
+const COLOR_MATCH = "Color match"
+const COMPLETE_OUTFIT = "Complete Outfit"
 
-export default function PromptScreen() {
+export default function PromptScreen({ navigation }) {
     const [selectedImageURI, setSelectedImage] = useState("")
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
-
+    const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
     const onChangeText = (text) => {
         setText(text)
     }
 
+    //TODO: make a request to backend API
+    const createRecommendations = async () => {
+
+    }
+
     return (
         <View style={styles.screenContainer}>
-
             <Image
                 style={styles.image}
                 resizeMode='contain'
@@ -24,6 +30,20 @@ export default function PromptScreen() {
                 }}
             />
 
+            <View style={styles.recommendationTypeContainer}>
+                <Pressable onPress={() => { setRecommendationType(COLOR_MATCH) }} style={[styles.recommendationTypeButton,
+                { opacity: recommendationType === COLOR_MATCH ? '1' : "0.5" }]} >
+                    <Text style={globalStyles.text}>
+                        Color Match
+                    </Text>
+                </Pressable>
+
+                <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT) }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? '1' : "0.5" }]} >
+                    <Text style={globalStyles.text}>
+                        Complete Outfit
+                    </Text>
+                </Pressable>
+            </View>
 
             <View>
                 <Text style={styles.exampleText}>
@@ -43,7 +63,6 @@ export default function PromptScreen() {
                         setIsSelecting(false)
                     }} />
                 </View>
-
             }
             {
                 !isSelecting &&
@@ -54,9 +73,9 @@ export default function PromptScreen() {
                         </Text>
                     </Pressable>
 
-                    <Pressable style={globalStyles.button} >
+                    <Pressable onPress={() => { navigation.navigate("Recommendation Screen", {}) }} style={globalStyles.button}>
                         <Text style={globalStyles.text}>
-                            Next Step
+                            Create Recommendations
                         </Text>
                     </Pressable>
                 </View>
@@ -65,8 +84,18 @@ export default function PromptScreen() {
     )
 }
 
-
 const styles = StyleSheet.create({
+    recommendationTypeContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 5
+    },
+
+    recommendationTypeButton: {
+        backgroundColor: "#FF835C",
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+    },
 
     screenContainer: {
         flexDirection: "column",
