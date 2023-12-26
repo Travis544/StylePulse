@@ -2,6 +2,7 @@ import { View, StyleSheet, Image, Pressable, Text, TextInput } from 'react-nativ
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
+import { encodeImage, uploadImageRequest } from '../VisionAPi';
 
 const COLOR_MATCH = "Color match"
 const COMPLETE_OUTFIT = "Complete Outfit"
@@ -11,13 +12,17 @@ export default function PromptScreen({ navigation }) {
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
     const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
+
+
     const onChangeText = (text) => {
         setText(text)
     }
 
-    //TODO: make a request to backend API
+    //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
-
+        const response = await uploadImageRequest(selectedImageURI, promptText, recommendationType)
+        console.log(response)
+        //navigation.navigate("Recommendation Screen", {})
     }
 
     return (
@@ -47,7 +52,11 @@ export default function PromptScreen({ navigation }) {
 
             <View>
                 <Text style={styles.exampleText}>
-                    Example:  Recommend a shirt that goes well with this pant..
+                    {
+                        recommendationType == COLOR_MATCH ?
+                            "Example:  Recommend me a shirt with colors that goes well with the pants in the picture.." :
+                            "Example: Recommend me a shoe that matches the style of the pants in the picture.."
+                    }
                 </Text>
                 <TextInput
                     style={styles.textInput}
@@ -73,7 +82,7 @@ export default function PromptScreen({ navigation }) {
                         </Text>
                     </Pressable>
 
-                    <Pressable onPress={() => { navigation.navigate("Recommendation Screen", {}) }} style={globalStyles.button}>
+                    <Pressable onPress={async () => { await createRecommendations() }} style={globalStyles.button}>
                         <Text style={globalStyles.text}>
                             Create Recommendations
                         </Text>
@@ -117,17 +126,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#303030",
         padding: 10,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#364F49',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 2,
-            },
-            android: {
-                elevation: 4,
-            },
-        }),
+        // ...Platform.select({
+        //     ios: {
+        //         shadowColor: '#364F49',
+        //         shadowOffset: { width: 0, height: 2 },
+        //         shadowOpacity: 0.5,
+        //         shadowRadius: 2,
+        //     },
+        //     android: {
+        //         elevation: 4,
+        //     },
+        // }),
     },
 
     buttonContainer: {

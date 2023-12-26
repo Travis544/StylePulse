@@ -1,14 +1,14 @@
 
-import {OpenAI}from "openai";
-import fs from 'fs'
+import { OpenAI } from "openai";
+// import fs from 'fs'
 import axios from 'axios'
 
 
-const openai = new OpenAI({apiKey: "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"}); 
+const openai = new OpenAI({ apiKey: "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", dangerouslyAllowBrowser: true });
 
 //const apiKey = process.env.OPENAI_API_KEY;
 
-const imagePath= "/Users/nanabonsu/Downloads/Jeans_Style_GPT.jpeg" //need to replace this with imagePath from image on Device
+const imagePath = "/Users/nanabonsu/Downloads/Jeans_Style_GPT.jpeg" //need to replace this with imagePath from image on Device
 const base64_img = encodeImage(imagePath)
 //text Prompt needs to be a variable and
 
@@ -19,29 +19,32 @@ const styleText = "What style top and shoes goes with this jeans. Return your an
 
 
 //The following function encodesTheImage in base64 string needed for vision API, but in our project may not need to read
-function encodeImage(imagePath) {
-    const image = fs.readFileSync(imagePath); 
-    return Buffer.from(image).toString('base64');
-  }
+export function encodeImage(imagePath) {
+  // const image = fs.readFileSync(imagePath);
+  // return Buffer.from(image).toString('base64');
+}
 
 
 
 const headers = {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${"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"}`
-  };
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${"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"}`
+};
 
+//Sends the image and user prompt to OPENAI vision API to retrieve recommendations based on the recommendation type
+export const uploadImageRequest = (base64_img, userPrompt, recommendationType) => {
   const payload = {
     model: "gpt-4-vision-preview",
     messages: [
       {
         role: "user",
         content: [
-          { type: "text", text: `${styleText}`},
+
+          { type: "text", text: `${userPrompt}. Return the response in JSON. Each key in the JSON is a number and the value.. ` },
           {
             type: "image_url",
             image_url: {
-              url: `data:image/jpeg;base64,${base64_img}`
+              url: base64_img
             }
           }
         ]
@@ -49,15 +52,15 @@ const headers = {
     ],
     max_tokens: 300
   };
-  
-const uploadImageRequest = () => {
-  axios.post("https://api.openai.com/v1/chat/completions", payload, { headers: headers })
-  .then(response => {
-    console.log(response.data.choices[0].message.content);
-  })
-  .catch(error => {
-    console.error("Error:", error);
-  });
+
+  return axios.post("https://api.openai.com/v1/chat/completions", payload, { headers: headers })
+    .then(response => {
+      console.log(response.data.choices[0].message.content);
+      return response.data.choices[0].message.content
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
 
 }
 
@@ -66,5 +69,5 @@ const uploadImageRequest = () => {
 uploadImageRequest();
 
 
-  //TODO: Need to format the response I believe to be JSON that can  be understood thats my problem!
+//TODO: Need to format the response I believe to be JSON that can  be understood thats my problem!
 
