@@ -20,8 +20,13 @@ export default function PromptScreen({ navigation }) {
 
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
-        const response = await uploadImageRequest(selectedImageURI, promptText, recommendationType)
-        console.log(response)
+        const response = await expo.DocumentPicker.getDocumentAsync({
+            base64: true,
+            copyToCacheDirectory: false,
+            type: '*/*',
+        });
+        // const response = await uploadImageRequest(selectedImageURI, promptText, recommendationType)
+        // console.log(response)
         //navigation.navigate("Recommendation Screen", {})
     }
 
