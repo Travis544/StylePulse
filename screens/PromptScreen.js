@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, Pressable, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
@@ -8,24 +8,39 @@ const COLOR_MATCH = "Color match"
 const COMPLETE_OUTFIT = "Complete Outfit"
 
 export default function PromptScreen({ navigation }) {
-    const [selectedImageURI, setSelectedImage] = useState("")
+    const [selectedImageURI, setSelectedImage] = useState("img") //State variable to hold the selected Image string
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
+    const [jSONResponse, setJSONResponse] = useState("")
     const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
 
-
+    //sets the promptText variable
     const onChangeText = (text) => {
         setText(text)
     }
 
+     //MIght need to use Expo filesystem to get this working out well, Check with Travus
+    const convertImageToBase64 = (imageURL) => {
+       return imageURL.toString('base64');
+    }
+
+
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
-        const response = await uploadImageRequest(selectedImageURI, promptText, recommendationType)
-        console.log(response)
+        console.log(selectedImageURI)
+            const base64_URL = convertImageToBase64(selectedImageURI)
+            console.log(base64_URL)
+            const response = await uploadImageRequest(base64_URL, promptText, recommendationType)
+            setJSONResponse(response)
+        
+       
+        //console.log(jSONResponse)
+        //
         //navigation.navigate("Recommendation Screen", {})
     }
 
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.screenContainer}>
             <Image
                 style={styles.image}
@@ -90,6 +105,7 @@ export default function PromptScreen({ navigation }) {
                 </View>
             }
         </View >
+       </TouchableWithoutFeedback>
     )
 }
 
