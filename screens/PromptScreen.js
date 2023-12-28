@@ -1,100 +1,137 @@
-import { View, StyleSheet, Image, Pressable, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
-import { encodeImage, uploadImageRequest } from '../VisionAPi';
-
-const COLOR_MATCH = "Color match"
-const COMPLETE_OUTFIT = "Complete Outfit"
+import { encodeImage, uploadImageRequest, fetchImageURLs } from '../VisionAPi';
+import { COLOR_MATCH, COMPLETE_OUTFIT } from "../constants"
 
 export default function PromptScreen({ navigation }) {
-    const [selectedImageURI, setSelectedImage] = useState("")
+    const [selectedImageURI, setSelectedImage] = useState("img") //State variable to hold the selected Image string
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
+    const [jSONResponse, setJSONResponse] = useState("")
     const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
 
-
+    //sets the promptText variable
     const onChangeText = (text) => {
         setText(text)
     }
 
+    //MIght need to use Expo filesystem to get this working out well, Check with Travus
+    const convertImageToBase64 = (imageURL) => {
+        return imageURL.toString('base64');
+    }
+
+    //convert recommendation style text from OpenAI to clothing data including the style text and image url.
+    async function transformRecommendationTextToClothingData(styleMatchRecommendations) {
+        const clothingTypeToImageUrls = {
+
+        }
+
+        for (const clothingType in styleMatchRecommendations) {
+            console.log(clothingType)
+            const styles = styleMatchRecommendations[clothingType]
+            clothingTypeToImageUrls[clothingType] = []
+
+            for (let style of styles) {
+                try {
+                    const imageUrls = await fetchImageURLs(style, 1)
+                    console.log(imageUrls)
+                    let clothingData = {
+                        style: style,
+                        imageUrl: imageUrls[0]
+                    }
+                    clothingTypeToImageUrls[clothingType].push(clothingData)
+
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        }
+
+        return clothingTypeToImageUrls
+    }
+
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
-        const response = await expo.DocumentPicker.getDocumentAsync({
-            base64: true,
-            copyToCacheDirectory: false,
-            type: '*/*',
-        });
-        // const response = await uploadImageRequest(selectedImageURI, promptText, recommendationType)
-        // console.log(response)
-        //navigation.navigate("Recommendation Screen", {})
+        console.log(selectedImageURI)
+        console.log(promptText)
+        const base64_URL = await encodeImage(selectedImageURI)
+        const response = await uploadImageRequest(base64_URL, promptText, recommendationType)
+        setJSONResponse(JSON.parse(response))
+        console.log(jSONResponse)
+        const res = await transformRecommendationTextToClothingData(jSONResponse)
+        console.log(res)
+        navigation.navigate("Recommendation Screen", { recommendations: res })
     }
 
     return (
-        <View style={styles.screenContainer}>
-            <Image
-                style={styles.image}
-                resizeMode='contain'
-                source={{
-                    uri: selectedImageURI
-                }}
-            />
-
-            <View style={styles.recommendationTypeContainer}>
-                <Pressable onPress={() => { setRecommendationType(COLOR_MATCH) }} style={[styles.recommendationTypeButton,
-                { opacity: recommendationType === COLOR_MATCH ? '1' : "0.5" }]} >
-                    <Text style={globalStyles.text}>
-                        Color Match
-                    </Text>
-                </Pressable>
-
-                <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT) }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? '1' : "0.5" }]} >
-                    <Text style={globalStyles.text}>
-                        Complete Outfit
-                    </Text>
-                </Pressable>
-            </View>
-
-            <View>
-                <Text style={styles.exampleText}>
-                    {
-                        recommendationType == COLOR_MATCH ?
-                            "Example:  Recommend me a shirt with colors that goes well with the pants in the picture.." :
-                            "Example: Recommend me a shoe that matches the style of the pants in the picture.."
-                    }
-                </Text>
-                <TextInput
-                    style={styles.textInput}
-                    onChangeText={onChangeText}
-                    value={promptText}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.screenContainer}>
+                <Image
+                    style={styles.image}
+                    resizeMode='contain'
+                    source={{
+                        uri: selectedImageURI
+                    }}
                 />
-            </View>
-            {
-                isSelecting &&
-                <View style={styles.buttonContainer}>
-                    <PhotoButton imageSelectedCallback={(imageURI) => {
-                        setSelectedImage(imageURI)
-                        setIsSelecting(false)
-                    }} />
-                </View>
-            }
-            {
-                !isSelecting &&
-                <View>
-                    <Pressable onPress={() => { setIsSelecting(true) }} style={[globalStyles.button, { marginBottom: "1%" }]} >
+
+                <View style={styles.recommendationTypeContainer}>
+                    <Pressable onPress={() => { setRecommendationType(COLOR_MATCH) }} style={[styles.recommendationTypeButton,
+                    { opacity: recommendationType === COLOR_MATCH ? '1' : "0.5" }]} >
                         <Text style={globalStyles.text}>
-                            Reselect Image
+                            Color Match
                         </Text>
                     </Pressable>
 
-                    <Pressable onPress={async () => { await createRecommendations() }} style={globalStyles.button}>
+                    <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT) }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? '1' : "0.5" }]} >
                         <Text style={globalStyles.text}>
-                            Create Recommendations
+                            Style Match
                         </Text>
                     </Pressable>
                 </View>
-            }
-        </View >
+
+                <View>
+                    <Text style={styles.exampleText}>
+                        {
+                            recommendationType == COLOR_MATCH ?
+                                "Example:  Recommend me a shirt with colors that goes well with the pants in the picture.." :
+                                "Example: Recommend me a shoe that matches the style of the pants in the picture.."
+                        }
+                    </Text>
+                    <TextInput
+                        style={styles.textInput}
+                        onChangeText={onChangeText}
+                        value={promptText}
+                    />
+                </View>
+                {
+                    isSelecting &&
+                    <View style={styles.buttonContainer}>
+                        <PhotoButton imageSelectedCallback={(imageURI) => {
+                            setSelectedImage(imageURI)
+                            setIsSelecting(false)
+                        }} />
+                    </View>
+                }
+                {
+                    !isSelecting &&
+                    <View>
+                        <Pressable onPress={() => { setIsSelecting(true) }} style={[globalStyles.button, { marginBottom: "1%" }]} >
+                            <Text style={globalStyles.text}>
+                                Reselect Image
+                            </Text>
+                        </Pressable>
+
+                        <Pressable onPress={async () => { await createRecommendations() }} style={globalStyles.button}>
+                            <Text style={globalStyles.text}>
+                                Create Recommendations
+                            </Text>
+                        </Pressable>
+                    </View>
+                }
+            </View >
+        </TouchableWithoutFeedback>
     )
 }
 
