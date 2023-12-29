@@ -19,6 +19,7 @@ export default function App() {
         <Stack.Screen
           name="Recommendation Screen"
           component={RecommendationScreen}
+
         />
       </Stack.Navigator>
       <StatusBar style="auto" />

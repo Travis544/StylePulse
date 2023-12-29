@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
@@ -9,8 +9,53 @@ export default function PromptScreen({ navigation }) {
     const [selectedImageURI, setSelectedImage] = useState("img") //State variable to hold the selected Image string
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
-    const [jSONResponse, setJSONResponse] = useState("")
+    // const [jSONResponse, setJSONResponse] = useState("")
     const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
+
+
+    // navigation.navigate("Recommendation Screen", {
+    //     recommendations: {
+    //         "Pants": [{
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         },
+    //         {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         }
+    //             ,
+    //         {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         }, {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         }, {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         }, {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         },
+    //         {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         }
+    //             ,
+    //         {
+    //             style: "Casual",
+    //             imageUrl:
+    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
+    //         }]
+    //     }
+    // })
 
     //sets the promptText variable
     const onChangeText = (text) => {
@@ -29,14 +74,14 @@ export default function PromptScreen({ navigation }) {
         }
 
         for (const clothingType in styleMatchRecommendations) {
-            console.log(clothingType)
+
             const styles = styleMatchRecommendations[clothingType]
             clothingTypeToImageUrls[clothingType] = []
 
             for (let style of styles) {
                 try {
                     const imageUrls = await fetchImageURLs(style, 1)
-                    console.log(imageUrls)
+
                     let clothingData = {
                         style: style,
                         imageUrl: imageUrls[0]
@@ -54,13 +99,22 @@ export default function PromptScreen({ navigation }) {
 
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
-        console.log(selectedImageURI)
-        console.log(promptText)
-        const base64_URL = await encodeImage(selectedImageURI)
-        const response = await uploadImageRequest(base64_URL, promptText, recommendationType)
-        setJSONResponse(JSON.parse(response))
-        console.log(jSONResponse)
-        const res = await transformRecommendationTextToClothingData(jSONResponse)
+        console.log("Creating recommendtings...")
+
+        let base64_image = selectedImageURI
+
+        //on the phone, the image uri is the file path so we have to read the file.
+        if (Platform.OS != "web") {
+            base64_image = await encodeImage(selectedImageURI)
+        }
+
+        const response = await uploadImageRequest(base64_image, promptText, recommendationType)
+
+        let res = {}
+        console.log("JSON RESPONSE")
+        const JSONResponse = JSON.parse(response)
+        console.log(JSONResponse)
+        res = await transformRecommendationTextToClothingData(JSONResponse)
         console.log(res)
         navigation.navigate("Recommendation Screen", { recommendations: res })
     }

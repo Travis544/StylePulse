@@ -51,6 +51,16 @@ let STYLE_MATCH_PROMPT = "Return the response in JSON. Each key in the JSON is t
 
 //Sends the image and user prompt to OPENAI vision API to retrieve recommendations based on the recommendation type
 export const uploadImageRequest = (base64_img, userPrompt, recommendationType) => {
+
+  // return JSON.stringify({
+  //   "shoes": ["oxford", "loafer", "sneaker", "boot", "brogue", "derby", "monk strap"]
+  // })
+
+
+  console.log("calling OPENAI API with...")
+  // console.log(base64_img)
+  console.log(userPrompt)
+  console.log(recommendationType)
   const selectedPrompt = recommendationType === COLOR_MATCH ? COLOR_MATCH_PROMPT : STYLE_MATCH_PROMPT
   const payload = {
     model: "gpt-4-vision-preview",
