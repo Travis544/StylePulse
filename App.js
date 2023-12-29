@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import PromptScreen from './screens/PromptScreen';
-import RecommendationScreen from './screens/RecommendationScreen';
+import StyleMatchRecommendationScreen from './screens/StyleMatchRecommendationScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator()
@@ -17,8 +17,8 @@ export default function App() {
           component={PromptScreen}
         />
         <Stack.Screen
-          name="Recommendation Screen"
-          component={RecommendationScreen}
+          name="Style Match Recommendation"
+          component={StyleMatchRecommendationScreen}
 
         />
       </Stack.Navigator>

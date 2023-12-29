@@ -12,51 +12,6 @@ export default function PromptScreen({ navigation }) {
     // const [jSONResponse, setJSONResponse] = useState("")
     const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
 
-
-    // navigation.navigate("Recommendation Screen", {
-    //     recommendations: {
-    //         "Pants": [{
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         },
-    //         {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         }
-    //             ,
-    //         {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         }, {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         }, {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         }, {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         },
-    //         {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         }
-    //             ,
-    //         {
-    //             style: "Casual",
-    //             imageUrl:
-    //                 "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/0a95a877-98e2-49d9-a51a-907ae95de450/jordan-chicago-womens-pants-0HRcZR.png"
-    //         }]
-    //     }
-    // })
-
     //sets the promptText variable
     const onChangeText = (text) => {
         setText(text)
@@ -109,14 +64,18 @@ export default function PromptScreen({ navigation }) {
         }
 
         const response = await uploadImageRequest(base64_image, promptText, recommendationType)
+        if (recommendationType === COMPLETE_OUTFIT) {
+            let res = {}
+            console.log("JSON RESPONSE")
+            const JSONResponse = JSON.parse(response)
+            console.log(JSONResponse)
+            res = await transformRecommendationTextToClothingData(JSONResponse)
+            console.log(res)
+            navigation.navigate("Style Match Recommendation", { recommendations: res })
+        } else {
+            //TODO handle color match
 
-        let res = {}
-        console.log("JSON RESPONSE")
-        const JSONResponse = JSON.parse(response)
-        console.log(JSONResponse)
-        res = await transformRecommendationTextToClothingData(JSONResponse)
-        console.log(res)
-        navigation.navigate("Recommendation Screen", { recommendations: res })
+        }
     }
 
     return (

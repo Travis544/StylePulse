@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Image, FlatList, } from 'react-nati
 
 import RecommendationCard from "../components/RecommendationCard"
 
-export default function RecommendationScreen({ route, navigation }) {
+export default function StyleMatchRecommendationScreen({ route, navigation }) {
 
     const { recommendations } = route.params
     console.log(recommendations)
