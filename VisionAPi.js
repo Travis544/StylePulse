@@ -45,7 +45,7 @@ const headers = {
 
 
 let COLOR_MATCH_PROMPT = ` 
-          Return the response in JSON. Each key in the JSON is the number rank and the value is the color.Avoid all other textual response`
+          Return the response in JSON. Each key in the JSON is the number rank and the value is another Json object with the key color and the value is the name of the color. The other key is the hexValue, with the value being the hexadecimal of the color. Avoid all other textual response`
 
 let STYLE_MATCH_PROMPT = "Return the response in JSON. Each key in the JSON is the clothing type and the value is an array of styles for that clothing type phrased as valid clothing. For example, cable knit should be cable knit sweater, but sneaker should only be put as sneaker since it is valid word for clothing. Only include clothing type not in the picture."
 

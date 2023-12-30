@@ -1,16 +1,20 @@
-import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
+import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard, Platform, ActivityIndicator } from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
 import { encodeImage, uploadImageRequest, fetchImageURLs } from '../VisionAPi';
 import { COLOR_MATCH, COMPLETE_OUTFIT } from "../constants"
+import { Overlay } from '@rneui/themed';
+
+
 
 export default function PromptScreen({ navigation }) {
     const [selectedImageURI, setSelectedImage] = useState("img") //State variable to hold the selected Image string
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
+    const [showSpinner, setShowSpinner] = useState(false)
     // const [jSONResponse, setJSONResponse] = useState("")
-    const [recommendationType, setRecommendationType] = useState(COLOR_MATCH)
+    const [recommendationType, setRecommendationType] = useState("")
 
     //sets the promptText variable
     const onChangeText = (text) => {
@@ -54,16 +58,26 @@ export default function PromptScreen({ navigation }) {
 
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
+        if (recommendationType == "") {
+            alert("Please select recommendation type")
+            return
+        }
+
+        if (promptText == "") {
+            alert("Please select a prompt text")
+            return
+        }
+
+        setShowSpinner(true)
         console.log("Creating recommendtings...")
-
         let base64_image = selectedImageURI
-
         //on the phone, the image uri is the file path so we have to read the file.
         if (Platform.OS != "web") {
             base64_image = await encodeImage(selectedImageURI)
         }
 
         const response = await uploadImageRequest(base64_image, promptText, recommendationType)
+
         if (recommendationType === COMPLETE_OUTFIT) {
             let res = {}
             console.log("JSON RESPONSE")
@@ -71,14 +85,19 @@ export default function PromptScreen({ navigation }) {
             console.log(JSONResponse)
             res = await transformRecommendationTextToClothingData(JSONResponse)
             console.log(res)
-           navigation.navigate("Style Match Recommendation", { recommendations: res })
+            setShowSpinner(false)
+
+            navigation.navigate("Style Match Recommendation", { recommendations: res })
         } else {
             //TODO handle color match
             let res = {}
             //parse JSOn
             const JSONResponse = JSON.parse(response) //
-
-
+            console.log(JSONResponse)
+            setShowSpinner(false)
+            navigation.navigate("Color Match Recommendation", {
+                recommendations: JSONResponse
+            })
         }
     }
 
@@ -86,10 +105,16 @@ export default function PromptScreen({ navigation }) {
 
         //here loop through json, then make an arry of really the keys, only? (CHeck the style parameter first.)
     }
-   
+
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <View style={styles.screenContainer}>
+
+            <View style={[styles.screenContainer, { opacity: showSpinner ? 0.5 : 1 }]}>
+
+                <Overlay overlayStyle={{ opacity: 0.8 }} isVisible={showSpinner}>
+                    <ActivityIndicator style={styles.spinnerStyle} size="large" />
+                </Overlay>
+
                 <Image
                     style={styles.image}
                     resizeMode='contain'
@@ -112,16 +137,13 @@ export default function PromptScreen({ navigation }) {
                         </Text>
                     </Pressable>
                 </View>
-
-
-
                 <View>
                     <Text>
 
                         {
                             recommendationType == COLOR_MATCH ?
-                            "Get recommendations on colors that match the clothes you want to wear":
-                            "Discover styles that go with the clothes you have"
+                                "Get recommendations on colors that match the clothes you want to wear" :
+                                "Discover styles that go with the clothes you have"
                         }
                     </Text>
                     <Text style={styles.exampleText}>
@@ -175,13 +197,24 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
 
+    spinnerStyle: {
+
+        opacity: 1
+    },
+
+    overlayStyle: {
+        opacity: 0.5,
+        width: 50,
+        height: 50
+    },
+
     recommendationTypeButton: {
         backgroundColor: "#FF835C",
         paddingVertical: 12, //controls both top and bottom badding
-        paddingHorizontal: 12, 
+        paddingHorizontal: 12,
         marginVertical: 20,
-        borderRadius:10,
-        marginTop:20
+        borderRadius: 10,
+        marginTop: 20
     },
 
     screenContainer: {
@@ -203,7 +236,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         color: "black",
         fontWeight: "bold",
-        fontSize:15
+        fontSize: 15
     },
 
     textInput: {
