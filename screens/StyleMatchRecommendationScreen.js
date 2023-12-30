@@ -44,7 +44,6 @@ export default function StyleMatchRecommendationScreen({ route, navigation }) {
     )
 }
 
-
 const styles = StyleSheet.create({
     sectionHeader: {
         fontWeight: "bold",

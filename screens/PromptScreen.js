@@ -29,9 +29,8 @@ export default function PromptScreen({ navigation }) {
         }
 
         for (const clothingType in styleMatchRecommendations) {
-
-            const styles = styleMatchRecommendations[clothingType]
-            clothingTypeToImageUrls[clothingType] = []
+            const styles = styleMatchRecommendations[clothingType] //this is getting 
+            clothingTypeToImageUrls[clothingType] = [] //setting value of key clothing type to be an array
 
             for (let style of styles) {
                 try {
@@ -48,9 +47,10 @@ export default function PromptScreen({ navigation }) {
                 }
             }
         }
-
         return clothingTypeToImageUrls
     }
+
+
 
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
@@ -71,13 +71,22 @@ export default function PromptScreen({ navigation }) {
             console.log(JSONResponse)
             res = await transformRecommendationTextToClothingData(JSONResponse)
             console.log(res)
-            navigation.navigate("Style Match Recommendation", { recommendations: res })
+           navigation.navigate("Style Match Recommendation", { recommendations: res })
         } else {
             //TODO handle color match
+            let res = {}
+            //parse JSOn
+            const JSONResponse = JSON.parse(response) //
+
 
         }
     }
 
+    const colorRecommendations = () => {
+
+        //here loop through json, then make an arry of really the keys, only? (CHeck the style parameter first.)
+    }
+   
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={styles.screenContainer}>
@@ -104,12 +113,22 @@ export default function PromptScreen({ navigation }) {
                     </Pressable>
                 </View>
 
+
+
                 <View>
+                    <Text>
+
+                        {
+                            recommendationType == COLOR_MATCH ?
+                            "Get recommendations on colors that match the clothes you want to wear":
+                            "Discover styles that go with the clothes you have"
+                        }
+                    </Text>
                     <Text style={styles.exampleText}>
                         {
                             recommendationType == COLOR_MATCH ?
-                                "Example:  Recommend me a shirt with colors that goes well with the pants in the picture.." :
-                                "Example: Recommend me a shoe that matches the style of the pants in the picture.."
+                                "Example:  What colors go well with the pants in the picture.." :
+                                "Example: Show me shoes that matches the style of these pants.."
                         }
                     </Text>
                     <TextInput
@@ -118,6 +137,7 @@ export default function PromptScreen({ navigation }) {
                         value={promptText}
                     />
                 </View>
+
                 {
                     isSelecting &&
                     <View style={styles.buttonContainer}>
@@ -157,8 +177,11 @@ const styles = StyleSheet.create({
 
     recommendationTypeButton: {
         backgroundColor: "#FF835C",
-        paddingVertical: 12,
-        paddingHorizontal: 12,
+        paddingVertical: 12, //controls both top and bottom badding
+        paddingHorizontal: 12, 
+        marginVertical: 20,
+        borderRadius:10,
+        marginTop:20
     },
 
     screenContainer: {
@@ -174,6 +197,13 @@ const styles = StyleSheet.create({
         marginTop: 1,
         color: "grey",
         marginBottom: 5,
+    },
+
+    choiceText: {
+        marginVertical: 10,
+        color: "black",
+        fontWeight: "bold",
+        fontSize:15
     },
 
     textInput: {
@@ -200,5 +230,8 @@ const styles = StyleSheet.create({
 
     image: {
         flex: 4,
+        borderColor: 'black',
+        borderWidth: 2,
+        borderRadius: 20
     }
 })
