@@ -54,8 +54,6 @@ export default function PromptScreen({ navigation }) {
         return clothingTypeToImageUrls
     }
 
-
-
     //call function to retrieve recomendations based on recommendation type.
     const createRecommendations = async () => {
         if (recommendationType == "") {
