@@ -1,10 +1,11 @@
-import { View, StyleSheet, ScrollView, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard, Platform, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, Pressable, Text, KeyboardAvoidingView, TextInput, TouchableWithoutFeedback, Keyboard, Platform, ActivityIndicator } from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
 import { encodeImage, uploadImageRequest, fetchImageURLs } from '../VisionAPi';
 import { COLOR_MATCH, COMPLETE_OUTFIT, COMPLETE_OUTFIT_REAL, COMPLETE_OUTFIT_REAL_USER_PROMPT } from "../constants"
 import { Overlay } from '@rneui/themed';
+
 
 
 
@@ -114,7 +115,7 @@ export default function PromptScreen({ navigation }) {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
-            <ScrollView style={[styles.screenContainer, { opacity: showSpinner ? 0.5 : 1 }]}>
+            <ScrollView automaticallyAdjustKeyboardInsets={true} style={[styles.screenContainer, { opacity: showSpinner ? 0.5 : 1 }]}>
 
                 <Overlay overlayStyle={{ opacity: 0.8 }} isVisible={showSpinner}>
                     <ActivityIndicator style={styles.spinnerStyle} size="large" />
@@ -224,12 +225,15 @@ export default function PromptScreen({ navigation }) {
                     }
 
                     {showPromptInput &&
+
+
                         <TextInput
                             style={styles.textInput}
                             onChangeText={onChangeText}
                             value={promptText}
                             multiline={true}
                         />
+
                     }
 
                 </View>
