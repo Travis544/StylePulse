@@ -138,8 +138,7 @@ export default function PromptScreen({ navigation }) {
                     </Pressable>
                 </View>
                 <View>
-                    <Text>
-
+                    <Text style={styles.choiceText}>
                         {
                             recommendationType == COLOR_MATCH ?
                                 "Get recommendations on colors that match the clothes you want to wear" :
@@ -149,14 +148,15 @@ export default function PromptScreen({ navigation }) {
                     <Text style={styles.exampleText}>
                         {
                             recommendationType == COLOR_MATCH ?
-                                "Example:  What colors go well with the pants in the picture.." :
-                                "Example: Show me shoes that matches the style of these pants.."
+                                "Example:  What colors go well with the pants in the picture..\n\n Example: What colors matches this..." :
+                                "Example: Show me shoes that matches the style of these pants..\n\n Example: Show me styles of hats that match this dress"
                         }
                     </Text>
                     <TextInput
                         style={styles.textInput}
                         onChangeText={onChangeText}
                         value={promptText}
+                        multiline={true}
                     />
                 </View>
 
@@ -229,14 +229,16 @@ const styles = StyleSheet.create({
     exampleText: {
         marginTop: 1,
         color: "grey",
-        marginBottom: 5,
+        fontSize: 15,
+        marginBottom: 10,
     },
 
     choiceText: {
         marginVertical: 10,
         color: "black",
         fontWeight: "bold",
-        fontSize: 15
+        fontSize: 15,
+        marginBottom:10
     },
 
     textInput: {
@@ -244,6 +246,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#303030",
         padding: 10,
+        borderRadius: 10,
+
         // ...Platform.select({
         //     ios: {
         //         shadowColor: '#364F49',

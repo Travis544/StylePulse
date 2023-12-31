@@ -57,6 +57,8 @@ export const uploadImageRequest = (base64_img, userPrompt, recommendationType) =
   // })
 
 
+  //TODO: Add a way to get more recommendations?
+
   console.log("calling OPENAI API with...")
   // console.log(base64_img)
   console.log(userPrompt)

@@ -11,7 +11,9 @@ export default function ColorMatchRecommendationScreen({ route, navigation }) {
 
     return (
         <TouchableOpacity style={{ flex: 1 }}>
-
+            <Text>
+                Colors that match your clothes are...
+            </Text>
             <FlatList
                 data={Object.entries(recommendations)}
                 renderItem={renderItem}

@@ -61,7 +61,7 @@ export default function PhotoButton({ imageSelectedCallback }) {
             </Pressable>
             <Pressable style={globalStyles.button} onPress={handleCameraLaunch}>
                 <Text style={globalStyles.text}>
-                    Choose from Camera
+                    Take a Photo
                 </Text>
             </Pressable>
         </View>

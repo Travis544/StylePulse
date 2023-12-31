@@ -8,6 +8,13 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
+  "splash": {
+    "image": "./assets/StylePulse_Logo.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
+  },
+  
+  
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
     "@react-navigation/native": "^6.1.9",
