@@ -3,7 +3,7 @@ import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
 import { encodeImage, uploadImageRequest, fetchImageURLs } from '../VisionAPi';
-import { COLOR_MATCH, COMPLETE_OUTFIT } from "../constants"
+import { COLOR_MATCH, COMPLETE_OUTFIT, COMPLETE_OUTFIT_REAL, COMPLETE_OUTFIT_REAL_USER_PROMPT } from "../constants"
 import { Overlay } from '@rneui/themed';
 
 
@@ -13,6 +13,7 @@ export default function PromptScreen({ navigation }) {
     const [isSelecting, setIsSelecting] = useState(true)
     const [promptText, setText] = useState("")
     const [showSpinner, setShowSpinner] = useState(false)
+    const [showPromptInput, setShowPromptInput] = useState(true)
     // const [jSONResponse, setJSONResponse] = useState("")
     const [recommendationType, setRecommendationType] = useState("")
 
@@ -61,6 +62,11 @@ export default function PromptScreen({ navigation }) {
             return
         }
 
+        if (!selectedImageURI) {
+            alert("Please upload or take a photo")
+            return
+        }
+
         if (promptText == "") {
             alert("Please select a prompt text")
             return
@@ -76,7 +82,8 @@ export default function PromptScreen({ navigation }) {
 
         const response = await uploadImageRequest(base64_image, promptText, recommendationType)
 
-        if (recommendationType === COMPLETE_OUTFIT) {
+        console.log(recommendationType)
+        if (recommendationType === COMPLETE_OUTFIT || recommendationType === COMPLETE_OUTFIT_REAL) {
             let res = {}
             console.log("JSON RESPONSE")
             const JSONResponse = JSON.parse(response)
@@ -85,7 +92,7 @@ export default function PromptScreen({ navigation }) {
             console.log(res)
             setShowSpinner(false)
 
-            navigation.navigate("Style Match Recommendation", { recommendations: res })
+            navigation.navigate("Recommendations", { recommendations: res })
         } else {
             //TODO handle color match
             let res = {}
@@ -121,45 +128,17 @@ export default function PromptScreen({ navigation }) {
                     }}
                 />
 
+                {
+                    !isSelecting &&
+                    <View>
+                        <Pressable onPress={() => { setIsSelecting(true) }} style={[globalStyles.button, { marginBottom: "1%" }]} >
+                            <Text style={globalStyles.text}>
+                                Reselect Image
+                            </Text>
+                        </Pressable>
 
-
-                <View style={styles.recommendationTypeContainer}>
-                    <Pressable onPress={() => { setRecommendationType(COLOR_MATCH) }} style={[styles.recommendationTypeButton,
-                    { opacity: recommendationType === COLOR_MATCH ? 1 : 0.5 }]} >
-                        <Text style={globalStyles.text}>
-                            Color Match
-                        </Text>
-                    </Pressable>
-
-                    <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT) }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? 1 : 0.5 }]} >
-                        <Text style={globalStyles.text}>
-                            Style Match
-                        </Text>
-                    </Pressable>
-                </View>
-
-                <View>
-                    <Text style={styles.choiceText}>
-                        {
-                            recommendationType == COLOR_MATCH ?
-                                "Get recommendations on colors that match the clothes you want to wear" :
-                                "Discover styles that go with the clothes you have"
-                        }
-                    </Text>
-                    <Text style={styles.exampleText}>
-                        {
-                            recommendationType == COLOR_MATCH ?
-                                "Example:  What colors go well with the pants in the picture..\n\n Example: What colors matches this..." :
-                                "Example: Show me shoes that matches the style of these pants..\n\n Example: Show me styles of hats that match this dress"
-                        }
-                    </Text>
-                    <TextInput
-                        style={styles.textInput}
-                        onChangeText={onChangeText}
-                        value={promptText}
-                        multiline={true}
-                    />
-                </View>
+                    </View>
+                }
 
                 {
                     isSelecting &&
@@ -170,24 +149,101 @@ export default function PromptScreen({ navigation }) {
                         }} />
                     </View>
                 }
-                {
-                    !isSelecting &&
-                    <View>
-                        <Pressable onPress={() => { setIsSelecting(true) }} style={[globalStyles.button, { marginBottom: "1%" }]} >
-                            <Text style={globalStyles.text}>
-                                Reselect Image
-                            </Text>
-                        </Pressable>
 
-                        <Pressable onPress={async () => { await createRecommendations() }} style={globalStyles.button}>
-                            <Text style={globalStyles.text}>
-                                Create Recommendations
-                            </Text>
-                        </Pressable>
-                    </View>
+
+                {
+                    recommendationType == "" &&
+                    < Text style={styles.choiceText} >
+                        Please select a recommendation type
+                    </Text>
                 }
+                <View style={styles.recommendationTypeContainer}>
+                    <Pressable onPress={() => { setRecommendationType(COLOR_MATCH); setShowPromptInput(true); }} style={[styles.recommendationTypeButton,
+                    { opacity: recommendationType === COLOR_MATCH ? 1 : 0.5 }]} >
+                        <Text style={globalStyles.text}>
+                            Color Match
+                        </Text>
+                    </Pressable>
+
+                    <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT); setShowPromptInput(true); }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? 1 : 0.5 }]} >
+                        <Text style={globalStyles.text}>
+                            Style Match
+                        </Text>
+                    </Pressable>
+
+                    <Pressable onPress={() => {
+                        setRecommendationType(COMPLETE_OUTFIT_REAL);
+                        setShowPromptInput(false);
+                        setText(COMPLETE_OUTFIT_REAL_USER_PROMPT)
+                    }} style={[styles.recommendationTypeButton,
+                    { opacity: recommendationType === COMPLETE_OUTFIT_REAL ? 1 : 0.5 }]} >
+                        <Text style={globalStyles.text}>
+                            Complete Outfit
+                        </Text>
+                    </Pressable>
+
+                </View>
+
+                <View>
+
+                    {
+                        recommendationType == COLOR_MATCH &&
+                        <View>
+                            <Text style={styles.choiceText}>
+                                "Get recommendations on colors that match the clothes you want to wear" :
+
+                            </Text>
+                            <Text style={styles.exampleText}>
+                                "Example:  What colors go well with the pants in the picture..
+                            </Text>
+                        </View>
+
+                    }
+
+
+                    {
+                        recommendationType == COMPLETE_OUTFIT &&
+                        <View>
+                            <Text style={styles.choiceText}>
+                                "Discover styles that go with the clothes you have"
+                            </Text>
+                            <Text style={styles.exampleText}>
+                                "Example: Show me shoes that matches the style of these pants..{"\n"}{"\n"} Example: Show me styles of hats that match this dress"
+                            </Text>
+                        </View>
+
+                    }
+
+                    {
+                        recommendationType == COMPLETE_OUTFIT_REAL &&
+                        <View>
+                            <Text style={styles.choiceText}>
+                                "Complete your outfit"
+                            </Text>
+                        </View>
+                    }
+
+                    {showPromptInput &&
+                        <TextInput
+                            style={styles.textInput}
+                            onChangeText={onChangeText}
+                            value={promptText}
+                            multiline={true}
+                        />
+                    }
+
+                </View>
+
+
+
+                <Pressable onPress={async () => { await createRecommendations() }} style={[globalStyles.button, { marginBottom: 80 }]}>
+                    <Text style={[globalStyles.text,]}>
+                        Create Recommendations
+                    </Text>
+                </Pressable>
+
             </ScrollView >
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback >
     )
 }
 
@@ -202,13 +258,14 @@ const styles = StyleSheet.create({
 
     buttonContainer: {
         flex: 1,
-        marginBottom: 80
+
     },
 
 
     recommendationTypeContainer: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
+        padding: 20,
         marginBottom: 5
     },
 
@@ -225,11 +282,11 @@ const styles = StyleSheet.create({
 
     recommendationTypeButton: {
         backgroundColor: "#FF835C",
-        paddingVertical: 12, //controls both top and bottom badding
-        paddingHorizontal: 12,
-        marginVertical: 20,
+        paddingVertical: 10, //controls both top and bottom badding
+        paddingHorizontal: 10,
+        marginHorizontal: 1,
         borderRadius: 10,
-        marginTop: 20
+
     },
 
     screenContainer: {

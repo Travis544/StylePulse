@@ -49,21 +49,16 @@ let COLOR_MATCH_PROMPT = `
 
 let STYLE_MATCH_PROMPT = "Return the response in JSON. Each key in the JSON is the clothing type and the value is an array of styles for that clothing type phrased as valid clothing. For example, cable knit should be cable knit sweater, but sneaker should only be put as sneaker since it is valid word for clothing. Only include clothing type not in the picture."
 
+let COMPLETE_OUTFIT_PROMPT = "Return the response in JSON. Each key in the JSON is the clothing type and the value is an array of styles for that clothing type phrased as valid clothing. For example, cable knit should be cable knit sweater, but sneaker should only be put as sneaker since it is valid word for clothing. Only include clothing type not in the picture."
 //Sends the image and user prompt to OPENAI vision API to retrieve recommendations based on the recommendation type
 export const uploadImageRequest = (base64_img, userPrompt, recommendationType) => {
-
-  // return JSON.stringify({
-  //   "shoes": ["oxford", "loafer", "sneaker", "boot", "brogue", "derby", "monk strap"]
-  // })
-
-
   //TODO: Add a way to get more recommendations?
 
   console.log("calling OPENAI API with...")
   // console.log(base64_img)
   console.log(userPrompt)
   console.log(recommendationType)
-  const selectedPrompt = recommendationType === COLOR_MATCH ? COLOR_MATCH_PROMPT : STYLE_MATCH_PROMPT
+  const selectedPrompt = recommendationType === COLOR_MATCH ? COLOR_MATCH_PROMPT : recommendationType == COMPLETE_OUTFIT ? STYLE_MATCH_PROMPT : COMPLETE_OUTFIT_PROMPT
   const payload = {
     model: "gpt-4-vision-preview",
     messages: [

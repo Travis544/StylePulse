@@ -16,7 +16,7 @@ export default function StyleMatchRecommendationScreen({ route, navigation }) {
                     ([clothingType, clothingDataArray], i) => {
                         return (
 
-                            <View style={styles.sectionContainer}>
+                            <View key={i} style={styles.sectionContainer}>
                                 <Text style={styles.sectionHeader}>
                                     {clothingType}
                                 </Text>
@@ -32,7 +32,7 @@ export default function StyleMatchRecommendationScreen({ route, navigation }) {
                                 </FlatList > */}
                                 <ScrollView horizontal>
                                     {
-                                        clothingDataArray.map((clothingData) => <RecommendationCard recommendationData={clothingData} />)
+                                        clothingDataArray.map((clothingData) => <RecommendationCard key={clothingData.style} recommendationData={clothingData} />)
                                     }
                                 </ScrollView>
                             </View>)

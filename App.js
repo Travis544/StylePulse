@@ -18,7 +18,7 @@ export default function App() {
           component={PromptScreen}
         />
         <Stack.Screen
-          name="Style Match Recommendation"
+          name="Recommendations"
           component={StyleMatchRecommendationScreen}
 
         />
