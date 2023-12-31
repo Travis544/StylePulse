@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard, Platform, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, Pressable, Text, TextInput, TouchableWithoutFeedback, Keyboard, Platform, ActivityIndicator } from 'react-native';
 import PhotoButton from '../components/PhotoButton'
 import { useState } from 'react';
 import { globalStyles } from '../globalStyles';
@@ -107,7 +107,7 @@ export default function PromptScreen({ navigation }) {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
-            <View style={[styles.screenContainer, { opacity: showSpinner ? 0.5 : 1 }]}>
+            <ScrollView style={[styles.screenContainer, { opacity: showSpinner ? 0.5 : 1 }]}>
 
                 <Overlay overlayStyle={{ opacity: 0.8 }} isVisible={showSpinner}>
                     <ActivityIndicator style={styles.spinnerStyle} size="large" />
@@ -121,20 +121,23 @@ export default function PromptScreen({ navigation }) {
                     }}
                 />
 
+
+
                 <View style={styles.recommendationTypeContainer}>
                     <Pressable onPress={() => { setRecommendationType(COLOR_MATCH) }} style={[styles.recommendationTypeButton,
-                    { opacity: recommendationType === COLOR_MATCH ? '1' : "0.5" }]} >
+                    { opacity: recommendationType === COLOR_MATCH ? 1 : 0.5 }]} >
                         <Text style={globalStyles.text}>
                             Color Match
                         </Text>
                     </Pressable>
 
-                    <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT) }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? '1' : "0.5" }]} >
+                    <Pressable onPress={() => { setRecommendationType(COMPLETE_OUTFIT) }} style={[styles.recommendationTypeButton, { opacity: recommendationType === COMPLETE_OUTFIT ? 1 : 0.5 }]} >
                         <Text style={globalStyles.text}>
                             Style Match
                         </Text>
                     </Pressable>
                 </View>
+
                 <View>
                     <Text style={styles.choiceText}>
                         {
@@ -183,12 +186,26 @@ export default function PromptScreen({ navigation }) {
                         </Pressable>
                     </View>
                 }
-            </View >
+            </ScrollView >
         </TouchableWithoutFeedback>
     )
 }
 
 const styles = StyleSheet.create({
+    image: {
+        flex: 6,
+        minHeight: 300,
+        borderColor: 'black',
+        borderWidth: 2,
+        borderRadius: 20
+    },
+
+    buttonContainer: {
+        flex: 1,
+        marginBottom: 80
+    },
+
+
     recommendationTypeContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -221,7 +238,9 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         marginRight: "auto",
         height: "70%",
-        width: "80%"
+        width: "100%",
+        padding: 20,
+
     },
 
     exampleText: {
@@ -236,7 +255,7 @@ const styles = StyleSheet.create({
         color: "black",
         fontWeight: "bold",
         fontSize: 15,
-        marginBottom:10
+        marginBottom: 10
     },
 
     textInput: {
@@ -259,14 +278,6 @@ const styles = StyleSheet.create({
         // }),
     },
 
-    buttonContainer: {
-        flex: 2,
-    },
 
-    image: {
-        flex: 4,
-        borderColor: 'black',
-        borderWidth: 2,
-        borderRadius: 20
-    }
+
 })

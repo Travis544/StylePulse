@@ -9,8 +9,8 @@ export const globalStyles = StyleSheet.create({
         borderRadius: 4,
         elevation: 3,
         backgroundColor: '#364F49',
-        borderRadius:10,
-        marginTop:20
+        borderRadius: 10,
+        marginTop: 20
     },
 
     text: {
