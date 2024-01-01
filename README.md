@@ -1,6 +1,6 @@
 # StylePulse
 
-()
+
 StylePulse is a cross platform mobile application that enables users to get personalized fashion recommendations about the clothes they want to wear. 
 
 The recommendations a  user can get are:
