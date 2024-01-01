@@ -5,9 +5,9 @@ import * as FileSystem from 'expo-file-system';
 
 import axios from 'axios'
 
-const API_KEY = "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"
+const API_KEY = ""
 const engine_ID = "e4f82bc1a18454ff9"
-const G_API_KEY = "AIzaSyB-tvnrIgn9E-S8dWOL23EL8rk2HHXfIHg"
+const G_API_KEY = ""
 const openai = new OpenAI({ apiKey: API_KEY, dangerouslyAllowBrowser: true });
 
 
